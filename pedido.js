@@ -1,0 +1,174 @@
+var db = firebase.firestore();
+
+//-------monstrar formulario
+
+function mostrar(dato) {
+	switch(dato) {
+		case "ver":
+			document.getElementById('form').style.display = "block";
+			document.getElementById('visualizar').style.display = "none";
+			break;
+		case "ocultar":
+			document.getElementById('form').style.display = "none";
+			document.getElementById('visualizar').style.display = "block";
+			document.getElementById('botong').style.display = "block";
+			document.getElementById('botone').style.display = "none";
+			break;
+	}
+}
+
+//---------agregar producto
+
+function agregar() {
+
+	var cantidado = parseFloat(document.getElementById('cantidad').value);
+	var fechao = document.getElementById('fecha').date;
+	var nombreo = document.getElementById('nombre').value;
+	var precioo = parseFloat(document.getElementById('precio').value);
+	var productoo = document.getElementById('producto').value;
+    var totalo = document.getElementById('total').value;
+	
+	db.collection("pedido").add({
+	
+		cantidad: cantidado,
+		fecha: fechao,
+        nombre: nombreo,
+        precio: precioo,
+        producto: productoo,
+        tatol: totalo,
+
+	})
+	.then((docRef) => {
+		 alert('El producto se guardo correctamente');
+	    console.log("Document written with ID: ", docRef.id);
+	})
+	.catch((error) => {
+		alert('Error');
+	    console.error("Error adding document: ", error);
+	});
+	
+	document.getElementById('form').style.display = "none";
+	document.getElementById('visualizar').style.display = "block";
+	
+	document.getElementById('cantidad').value = "";
+	document.getElementById('fecha').date ="";
+	document.getElementById('nombre').value = "";
+	document.getElementById('precio').value = "";
+	document.getElementById('producto').value = "";
+}
+//---------leerpedido	
+	
+function leerpedido() {	
+	
+	
+	//---------consulta a la colección
+		db.collection("pedido")
+				.onSnapshot((querySnapshot) => {
+					document.getElementById('conpedido').innerHTML = "";
+	    			querySnapshot.forEach((doc) => {
+	    				//---------muestra la consulta
+	        			console.log(`${doc.id} => ${doc.data()}`);
+	        			console.log(`Nombre => ${doc.data().nombre}`);
+						document.getElementById("conpedido").innerHTML += `
+							<tr>
+								<td>${doc.data().cantidad}</td>
+								<td>${doc.data().fecha}</td>
+								<td>${doc.data().nombre}</td>
+								<td>${doc.data().precio}</td>
+								<td>${doc.data().producto}</td>
+                                <td>${doc.data().total}</td>
+								<td>
+									<span class="fas fa-edit" id="iconed" title="Editar" onclick="llenar_form('${doc.pid}', '${doc.data().cantidad}', '${doc.data().fecha}', '${doc.data().nombre}', '${doc.data().precio}', '${doc.data().producto}', '${doc.data().total}')"></span>
+									<span class="fas fa-trash-alt" id="iconbo" title="Elminar" onclick="pregunta_el('${doc.id}')"></span>								
+								</td>
+							</tr>
+						
+						`;	        			
+	        			
+	    			});
+	});	
+}
+
+leerpedido();
+	
+	
+	
+//eliminar pedido	
+
+function pregunta_el(pid) {
+	console.log(pid);
+	if(confirm("Esta seguro de eliminar el registro")){
+		eliminar(pid);	
+	}else {
+		console.log("no se borro");
+	}
+}
+	
+function eliminar(pid) {
+	
+	db.collection("pedido").doc(pid).delete().then(() => {
+		 alert("Se ha eliminado el producto");	    
+	    //console.log("Document successfully deleted!");
+	}).catch((error) => {
+		 alert("error");
+	    console.error("Error removing document: ", error);
+	});
+}	
+
+//---------editar registro
+
+function llenar_form(pid, cantidad, fecha, nombre, precio, producto, total) {
+	
+	document.getElementById('cantidad').value = cantidad;
+	document.getElementById('fecha').date = fecha;
+	document.getElementById('nombre').value = nombre;
+	document.getElementById('precio').value = precio;
+	document.getElementById('producto').value = producto;
+    document.getElementById('total').value = total;
+	mostrar('ver');
+	document.getElementById('botong').style.display = "none";
+	document.getElementById('botone').style.display = "block";
+}
+
+
+function editar() {
+
+
+	var cantidado = parseFloat(document.getElementById('cantidad').value);
+	var fechao = document.getElementById('fecha').date;
+	var nombreo = document.getElementById('nombre').value;
+	var precioo = parseFloat(document.getElementById('precio').value);
+	var productoo = document.getElementById('producto').value;
+    var totalo = document.getElementById('total').value;
+	
+	var productoRef = db.collection("pedido").doc(pid);
+			
+			// Set the "capital" field of the city 'DC'
+			return pedidoRef.update({
+
+			    cantidad: cantidado,
+		        fecha: fechao,
+                nombre: nombreo,
+                precio: precioo,
+                producto: productoo,
+                total: totalo,
+			})
+			.then(function() {
+			    console.log("Document successfully updated!");
+				   document.getElementById('visualizar').style.display = "block";
+	
+                   document.getElementById('cantidad').value = cantidad;
+                   document.getElementById('fecha').date = fecha;
+                   document.getElementById('nombre').value = nombre;
+                   document.getElementById('precio').value = precio;
+                   document.getElementById('producto').value = producto;
+                   document.getElementById('total').value = total;
+				   mostrar('ocultar');  
+			})
+			.catch(function(error) {
+			    // The document probably doesn't exist.
+			    alert("error");
+			    console.error("Error updating document: ", error);
+			});
+			
+}

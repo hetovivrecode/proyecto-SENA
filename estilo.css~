@@ -1,0 +1,19 @@
+input{
+	margin-top: 5px;
+}
+
+
+#iconed, #iconbo{
+	font-size: 20px;
+	cursor: pointer;
+}
+
+#iconed{
+	color: blue;
+}
+
+#iconbo{
+	color: red;
+}
+
+
